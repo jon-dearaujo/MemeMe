@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allow us to select a picture from your Photo Library?</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Allow us to take a picture to use on your Memes?</string>
 	<key>UIApplicationSceneManifest</key>
