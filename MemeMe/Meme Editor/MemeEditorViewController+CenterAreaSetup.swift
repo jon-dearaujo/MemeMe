@@ -8,16 +8,39 @@
 import UIKit
 
 extension MemeEditorViewController: UITextFieldDelegate {
+
+    fileprivate func setupTextField(_ textField: UITextField, initialText: String) {
+        imageView.addSubview(textField)
+
+        let textFont = UIFont(name: "HelveticaNeue-CondensedBlack", size: 40)!
+        UIFontMetrics(forTextStyle: .body).scaledFont(for: textFont)
+
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.widthAnchor.constraint(lessThanOrEqualTo: imageView.widthAnchor, constant: -24).isActive = true
+        textField.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        textField.centerXAnchor.constraint(equalTo: imageView.centerXAnchor).isActive = true
+
+        textField.textAlignment = .center
+        textField.text = initialText
+        textField.autocapitalizationType = .allCharacters
+        textField.adjustsFontSizeToFitWidth = true
+        textField.defaultTextAttributes = [
+            NSAttributedString.Key.strokeColor: UIColor.black,
+            NSAttributedString.Key.foregroundColor: UIColor.white,
+            NSAttributedString.Key.font: textFont,
+            NSAttributedString.Key.strokeWidth: -5.0,
+        ]
+        textField.delegate = self
+    }
+
     func setupCenterAreaAndAttachTo(container: UIStackView) {
         imageView = UIImageView(frame: container.bounds)
-        imageView.center = container.center
         imageView.isUserInteractionEnabled = true
-        imageView.contentMode = .scaleAspectFill
+        imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
         container.addArrangedSubview(imageView)
         imageView.backgroundColor = .black
-
 
         imageView.leadingAnchor.constraint(equalTo: container.leadingAnchor).isActive = true
         imageView.trailingAnchor.constraint(equalTo: container.trailingAnchor).isActive = true
@@ -26,37 +49,13 @@ extension MemeEditorViewController: UITextFieldDelegate {
         imageView.centerXAnchor.constraint(equalTo: container.centerXAnchor).isActive = true
         imageView.centerYAnchor.constraint(equalTo: container.centerYAnchor).isActive = true
 
-        let textFont = UIFont(name: "HelveticaNeue-CondensedBlack", size: 40)!
-        UIFontMetrics(forTextStyle: .body).scaledFont(for: textFont)
-
         topText = UITextField(frame: imageView.frame)
-        imageView.addSubview(topText)
-        topText.translatesAutoresizingMaskIntoConstraints = false
+        setupTextField(topText, initialText: MemeEditorViewController.TOP_TEXT)
         topText.topAnchor.constraint(equalTo: imageView.topAnchor, constant: 24).isActive = true
-        topText.centerXAnchor.constraint(equalTo: imageView.centerXAnchor).isActive = true
-        topText.text = MemeEditorViewController.TOP_TEXT
-        topText.autocapitalizationType = .allCharacters
-        topText.defaultTextAttributes = [
-            NSAttributedString.Key.strokeColor: UIColor.black,
-            NSAttributedString.Key.foregroundColor: UIColor.white,
-            NSAttributedString.Key.font: textFont,
-        ]
-        topText.delegate = self
 
         bottomText = UITextField(frame: imageView.frame)
-        imageView.addSubview(bottomText)
-        bottomText.translatesAutoresizingMaskIntoConstraints = false
+        setupTextField(bottomText, initialText: MemeEditorViewController.BOTTOM_TEXT)
         bottomText.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -24).isActive = true
-        bottomText.centerXAnchor.constraint(equalTo: imageView.centerXAnchor).isActive = true
-        bottomText.text = MemeEditorViewController.BOTTOM_TEXT
-        bottomText.autocapitalizationType = .allCharacters
-        bottomText.defaultTextAttributes = [
-            NSAttributedString.Key.strokeColor: UIColor.black,
-            NSAttributedString.Key.foregroundColor: UIColor.white,
-            NSAttributedString.Key.font: textFont
-        ]
-        bottomText.delegate = self
-        bottomText.adjustsFontForContentSizeCategory = true
     }
 
     @objc func keyboardWillAppear(_ notification: Notification) {
@@ -82,8 +81,11 @@ extension MemeEditorViewController: UITextFieldDelegate {
         return true
     }
 
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        self.saveMeme()
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        // Generate a new meme image every time the text changes to avoid missing changes to the text
+        // after the image was selected already.
+        generateMemedImage()
+        return true
     }
 }
 

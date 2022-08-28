@@ -10,18 +10,18 @@ import LinkPresentation
 
 extension MemeEditorViewController: UIActivityItemSource {
     func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
-        return meme!.memedImage
+        return memedImage!
     }
 
     func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
-        return meme!.memedImage
+        return memedImage
     }
 
     func activityViewControllerLinkMetadata(_ activityViewController: UIActivityViewController) -> LPLinkMetadata? {
         let metadata = LPLinkMetadata()
         metadata.title = "MemeMe"
-        metadata.imageProvider = NSItemProvider(object: meme!.memedImage)
-        metadata.iconProvider = NSItemProvider(object: meme!.memedImage)
+        metadata.imageProvider = NSItemProvider(object: memedImage)
+        metadata.iconProvider = NSItemProvider(object: memedImage)
         return metadata
     }
 
@@ -65,6 +65,7 @@ extension MemeEditorViewController: UIActivityItemSource {
     private func shareMeme(_: UIAction) {
         let activityController = UIActivityViewController(activityItems: [self], applicationActivities: nil)
         activityController.completionWithItemsHandler = { type, completed, returnedItems, error in
+            self.saveMeme()
             activityController.dismiss(animated: true)
         }
         present(activityController, animated: true)

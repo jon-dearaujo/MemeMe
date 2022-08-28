@@ -37,22 +37,25 @@ extension MemeEditorViewController: UIImagePickerControllerDelegate, UINavigatio
     }
 
     private func cameraPressed(_: UIAction) {
-        let picker = UIImagePickerController()
-        picker.delegate = self
-        picker.sourceType = .camera
-        self.present(picker, animated: true)
+        openImagePicker(type: .camera)
     }
 
     private func albumButtonPressed(_: UIAction) {
+        openImagePicker(type: .photoLibrary)
+    }
+
+    private func openImagePicker(type:  UIImagePickerController.SourceType) {
         let picker = UIImagePickerController()
         picker.delegate = self
-        self.present(picker, animated: true)
+        picker.sourceType = type
+        present(picker, animated: true)
     }
 
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let image = info[.originalImage] as? UIImage {
             imageView.image = image
-            self.saveMeme()
+            generateMemedImage()
+            shareButton.isEnabled = true
             picker.dismiss(animated: true)
         }
     }
@@ -63,27 +66,18 @@ extension MemeEditorViewController: UIImagePickerControllerDelegate, UINavigatio
 
     func saveMeme() {
         if let topText = topText.text, let bottomText = bottomText.text, let image = imageView.image {
-            self.meme = Meme(topText: topText, bottomText: bottomText, image: image, memedImage: generateMeme())
-            self.shareButton.isEnabled = true
-        } else {
-            self.meme = nil
-            self.shareButton.isEnabled = false
+            meme = Meme(topText: topText, bottomText: bottomText, image: image, memedImage: memedImage)
         }
     }
 
-    private func generateMeme() -> UIImage {
-        print("image size => ", imageView.image!.size)
-        print("view size => ", imageView.bounds .size)
+    func generateMemedImage() {
         UIGraphicsBeginImageContextWithOptions(imageView.bounds.size, true, 0)
-//        These lines of code are not working as expected. Camera image is too big for the texts
+//        These lines of code are not working as expected. Camera image is too big for the texts.
+//        Had to replace with imageView.layer.render call to have the image correctly sized.
 //        imageView.drawHierarchy(in: imageView.bounds, afterScreenUpdates: true)
 //        let memeImage = UIGraphicsGetImageFromCurrentImageContext()!
         imageView.layer.render(in: UIGraphicsGetCurrentContext()!)
-        let memeImage = UIGraphicsGetImageFromCurrentImageContext()!
+        memedImage = UIGraphicsGetImageFromCurrentImageContext()!
         UIGraphicsEndImageContext()
-        print("image size => ", imageView.image!.size)
-        print("view size => ", imageView.bounds .size)
-        print("result size => ", memeImage.size)
-        return memeImage
     }
 }

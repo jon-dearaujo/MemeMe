@@ -11,6 +11,7 @@ class MemeEditorViewController: UIViewController {
 
     static let TOP_TEXT = "TOP TEXT"
     static let BOTTOM_TEXT = "BOTTOM TEXT"
+
     var topText: UITextField!
     var bottomText: UITextField!
     var shareButton: UIButton!
@@ -21,6 +22,7 @@ class MemeEditorViewController: UIViewController {
     var screenStack: UIStackView!
     var isKeyboardOpen = false
     var meme: Meme?
+    var memedImage: UIImage!
 
     override func viewDidLoad() {
         super.viewDidLoad()
