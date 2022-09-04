@@ -65,7 +65,9 @@ extension MemeEditorViewController: UIActivityItemSource {
     private func shareMeme(_: UIAction) {
         let activityController = UIActivityViewController(activityItems: [self], applicationActivities: nil)
         activityController.completionWithItemsHandler = { type, completed, returnedItems, error in
-            self.saveMeme()
+            if completed {
+                self.saveMeme()
+            }
             activityController.dismiss(animated: true)
         }
         present(activityController, animated: true)
